@@ -1,0 +1,364 @@
+---
+title: "Daniele_Beretta_applied_regression"
+author: "Beretta Daniele"
+date: "`r Sys.Date()`"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+QUESTION 1
+As first, we should set the working directory in the folder where the dataset Crime is included. Then, we can upload the dataset Crime, renaming it "Dati". The dataset is composed by (122 covariates, 1 goal to predict) 
+
+```{r}
+#Set the working directory from the iterative menu
+#(Session-> Set working Directory-> Choose the directory according to the folder in which the file "crime" is )
+
+# In my case it's:
+setwd("C:/Users/dapaf/OneDrive/Desktop/APPLIED STATISTICAL MODELLING/Assignment Part 1-20221221")
+
+# Import the dataset Crime
+Dati<-read.table("crime.txt", header=T, sep=";")
+```
+The goal is to compute a linear regression to estimate the logarithm of Y.
+
+Y is named as ViolentCrimesPerPop and it's the total number of violent crimes per 100K population.
+The computation of the logarithm of Y was necessary to compute a percentage variation of Y.
+
+Therefore, coefficients in the linear regression can be interpreted as the percentage change in the response Y when the variable x, to which it refers, increases by 1 unit, holding all others fixed.
+
+So, we can start by concentrating on the true value of the responses (called also indipendent variable) Y, compute their logarithm value, and then we can compute the Mean of Y (equal to -1.851175). This is important to compute the TSS(Total Sum of Square) for the analysis of the Deviance theorem.
+
+```{r}
+# Extract log(y) from the dataset, and compute the mean of y
+l_y<-log(Dati$y)
+l_y_bar<-mean(l_y)
+l_y_bar
+```
+
+Later on, it's possible to build the Design matrix of the covariates. This is a fundamental point in order to implement a linear regression using the Hat projection matrix. In the following part of the command, it's possible to observe also the definition of "n" and "p", respectively as number of units and number of predictors(excluding the intercept).
+
+```{r}
+# Delete the value of the column y, in order to build the matrix of the covariates
+Dati$y<-NULL
+
+#Define the Covariates Matrix X
+X<-Dati
+X<- as.matrix(X)
+
+#Define the number of units in the dataset
+n=nrow(X)
+n
+
+# Define the number of predictors(excluding the intercept)
+p=ncol(X)
+p
+
+# Build the design Matrix (dimension nxp+1)
+X1<-model.matrix(l_y~X, data=Dati)
+```
+
+So now, the building of the design matrix allows to compute the ols estimation of the multiple linear regression. To do that, we can use two cases:
+1) the product between the Hat matrix and l_y (logarithm of the observed value for y)
+2) the command "lm". This command provides the estimation of the standard error, the Ttest and the P-value for each predictor,
+
+```{r}
+#Compute Beta
+beta_=solve(t(X1)%*%X1)%*%t(X1)%*%l_y
+beta_
+
+```
+
+After having computed the coefficients, it's crucial to analyse their statistical significance. 
+
+Studying statistical significance means to do a test of hypothesis with the null hypothesis of the single coefficient equal to 0 , against the alternative one which it's different from 0.
+
+To do that, we need to compute the residuals They're the result of the difference between the true values of Y and their estimations, made up by the product of the transposed design matrix and the vector of coefficients Beta. Thanks to the residuals, we can compute the RSS(Residual Sum of Squares) as the sum, from 1 to n(number of units), of their square. Consequently, we can use the RSS to compute the standard errors of the maximum likelihood coefficients, which, in the multiple linear regression, are equal to the OLS one. 
+
+The coefficient's standard errors are computed as the ratio of the residual variance(RSS/n-p-1) and the square root  of the diagonal of the inverse matrix of the product between the transposed design matrix and the design matrix. 
+
+The standard errors are used to compute the confidence interval for the coefficients. In fact, to find the below and the upper limit of the confidence interval, we should respectively subtract and add the coefficient to the product of the coefficient's standard error  with the 1-alpha/2 quantile of a tstudent with n-p-1 degree of freedom.
+
+They're important, since if the zero is in the interval, it means that the coefficient is not statistical significant. In this case, we compute a 95% confidence interval(in the 95% of cases, the coefficient belongs to the interval)
+
+```{r}
+# Compute the estimation for y, naming it y_hat
+l_y_hat = (X1)%*%beta_
+
+# Compute the residuals 
+e_hat= l_y-l_y_hat
+
+# Compute the RSS
+RSS= sum((e_hat)^2)
+RSS
+# Compute the standard error
+SIG2=RSS/(n-p-1)
+SIG2
+se=(SIG2*diag(solve(t(X1)%*%X1)))^0.5
+se
+
+#Implement a for loop to compute the confidence interval at level 95%
+for(i in 1:length(beta_)){
+  tminbeta=beta_[i]-qt(1-0.025, df=n-p-1)*se[i]
+  tminbeta
+  
+  tmaxbeta=beta_[i]+qt(1-0.025, df=n-p-1)*se[i]
+  tmaxbeta
+  
+  print(c(tminbeta, tmaxbeta))
+}
+```
+
+Otherwise, the confidence interval for a coefficient is not the unique instrument to measure the statistical significance. In fact,we can use also the ttest and the p-value. The ttest is fundamental to compute the p-value, which is the double of the value of the difference between 1 and the probability that the ttest is minor or equal than the tcritic(the value of the (1-alpha)/2 quantile of a tstudent with n-p-1 degree of freedom). to be significant, a coefficient's p-value should be minor than alpha(the level of credibility).
+
+```{r}
+### Compute the ttest
+for(i in 1:length(beta_)){
+  ttest=beta_[i]/se[i]
+  print(c(ttest))
+} 
+
+# Compute the p-value
+for(i in 1:length(beta_)){
+  pvalue=2*min((1-pt(beta_[i]/se[i], df=n-p-1)), 
+  (pt(beta_[i]/se[i], df=n-p-1)))
+  print(c(pvalue))
+}
+
+```
+
+As we can see from the p-value result, there are few coefficient, which are statistical significant at a level of credibility equal to 0.05. They're the coefficient of the following variables:
+- Xx.v6: population: population for community
+- Xx.v11:racePctHisp: percentage of population that is of hispanic heritage
+-Xx.v16: numbUrban: number of people living in areas classified as urban.
+-Xx.v17:pctUrban: percentage of people living in areas classified as urban.
+-Xx.v21:- pctWInvInc: percentage of households with investment / rent income in 1989.
+-Xx.v25:medFamInc: median family income  (numeric - decimal)
+-Xx.v43:PctOccupMgmtProf: percentage of people 16 and over who are employed in management or professional occupations
+-Xx.v45: MalePctNevMarr: percentage of males who have never married
+-Xx.v50:PctKids2Par: percentage of kids in family housing with two parents
+-Xx.v55 NumImmig: total number of people known to be foreign born
+-Xx.v56 PctIlleg: percentage of kids born to never married
+-Xx.v61 PctImmigRec10: percentage of immigrants who immigated within last 10 years
+-Xx.v67PctNotSpeakEnglWell: percent of people who do not speak English well
+-Xx.v78: PctHousOccup: percent of housing occupied 
+-Xx.v81 PctVacMore6Mos: percent of vacant housing that has been vacant more than 6 months
+-Xx.v88: RentLowQ: rental housing - lower quartile rent
+-Xx.v97: PctForeignBorn: percent of people foreign born
+-Xx.v121:PctUsePubTrans: percent of people using public transit for commuting.
+
+After having studied the statistical significance, a key step is to study the deviance decomposition theorem in the model. To do that, we can compute the "total sum of squares (TSS)" (sum of the squared differences between the singles observed responses and their mean), the "explained sum of squares (ESS)" (sum of the squared differences between the singles estimated responses and their estimated mean) and "the residual sum of squares (RSS)". 
+
+So, according to the deviance decomposition, we should have:
+TSS=ESS+RSS
+
+If we divide all of them for (n-1), we obtain respectively:
+- The Total  sample variance(TSS/(n-1)) which measures the  variability of the observations around their mean
+- The Explained variance (ESS/(n-1)) which measures the variability explained by the model
+- The Residual variance (RSS/(n-1)) which measures the unexplained variability.
+
+The three measures are essential to compute the R_squared(R2). 
+This index evaluate the proportion of probability in y that can be explained by using the covariates X. 
+The R2 can be calculated in 2 ways:
+1) R2=ESS/TSS
+2) R2=1-RSS/TSS
+and it can assume values between 0 and 1.
+
+If the R2 is close to 1, then there's a large proportion of variability explained by the model (it fits well), otherwise if it's near to 0, the model does not fit well the reality (a lot of unexplained variabilty).
+REMIND: R2 increase every time a new variable, even not statistical significant, is included
+As we will see, in this case we obtain a good R2 of 0.7, probably thanks to the high number of features included in the model.
+
+```{r}
+# Compute the estimation for y, naming it y_hat
+l_y_hat = (X1)%*%beta_
+
+
+### Verify the Deviance Composition theorem (TSS=ESS+RSS)
+# Compute the residuals 
+e_hat= l_y-l_y_hat
+
+# Compute the RSS
+RSS= sum((e_hat)^2)
+RSS
+# Compute the mean of the estimation l_y_hat
+l_y_hat_bar=mean(l_y_hat)
+
+#Compute the ESS
+ESS=sum((l_y_hat-l_y_hat_bar)^2)
+ESS
+
+# Compute the ESS+RSS
+ESS+RSS
+
+#Compute the TSS
+TSS=sum((l_y-l_y_bar)^2)
+TSS
+# Compute the R2
+R2= ESS/TSS
+R2
+#or
+R2_=1-RSS/TSS
+R2_
+
+```
+
+
+
+QUESTION 2
+```{r, fig.height = 4, fig.width = 6}
+
+# Standardize the X matrix
+Xscaled<-as.matrix(scale(X))
+# Compute correlation among variables of X 
+corX<-cor(Xscaled)
+
+#Use the library ggcorrplot (N.B. We should install the package before launching the code of the library)
+library(ggcorrplot)
+
+#Plot the matrix 
+ggcorrplot(corX, tl.cex=0.8)
+```
+ In this plot each small square represent an element of the correlation matrix. Because of the high number of variables, the name of the variable are very small. To interpret it, it's important to underline that on the X axe we read from the left(Xx.v6) to the right(Xx.v127) and on the y axe the variables are ordered in a decreasing way(up=Xx.v127, down=Xx.v6). 
+From the graph, we can observe a red diagonal which refers to the correlation of a variable with itself. Since the formula of the correlation is the covariance of x1 and x2 over the product of the standard error of x1 and the standard error of x2. Since the two variables are the same, this ratio is always equal to 1.   
+However, the correlation is quite high for many variables.Therefore, we have a problem of imperfect multicollinearity. This problem implies an increase of the standard errors of the coefficients. Consequently, the estimates are not precise and the coefficients tend to be smaller.
+
+
+QUESTION 3:
+In a subset selection model, we should perform 2^p different models. 
+To have a Best subset selection model:
+1)We should fit all (p!/k!) models that contain k predictors.
+2) Pick the best models for the k number of predictors.
+3) Choose the best among the best models for each of k predictors.
+The best model has the smallest RSS, AIC (Akaike Information Criterion), BIC (Bayesian Information Criterion) or the highest R2 or adjusted R2.
+
+Since, in this case, we should perform 2^122 different model(5,317*10^36). Since the number is very high and my computer is very slow, probably my laptop will needs several hours, or even days, to perform a selection like that.
+
+In the following code it will be performed respectively a best backward stepwise selection and a best forward stepwise selection. To select the best model, I decided to focus my choose only on the BIC index, which has to be minimized.
+
+The BIC formula is the following one:
+BIC=-2log(L)+log(n)*p, where -2log(L) is the natural logarithm of the likelihood of the model and it measures the model deviance.
+
+The concept of the deviance is really important, especially in the logistic regression.
+
+```{r, fig.height = 4, fig.width = 6}
+# Install the library leaps
+library(leaps)
+
+#Perform a Stepwise selection both forward and backward, to search for a sub-optimal model.
+# We Use the R package leaps
+# Compute the backward stepwise selection model for the regression and
+# observe the best number of predictors to include in the best model 
+regback = regsubsets(l_y ~ X, data=Dati, 
+                     method = "backward", nvmax = 122)
+reg_b_summary=summary(regback)
+which.min(reg_b_summary$bic)
+
+# Plot the index BIC of the different model on the y axe and the number of the predictors in the best model according to the BIC. 
+plot(reg_b_summary$bic, xlab ="n_pred", ylab = " BIC", type = "l")
+plot(reg_b_summary$bic, xlim=c(10,30), ylim=c(-2100, -2000), xlab = "n_pred", ylab = " BIC", type = "l", col="red")
+which.min(reg_b_summary$bic)
+
+#Compute the forward stepwise selection.
+# In this selection method, we start from beta0=beta_[1] 
+# and we add a predictor at a time till no further 
+# improvement is possible
+regforw = regsubsets(l_y ~ X, data=Dati, method = "forward", nvmax=122)
+reg_f_summary= summary(regforw)
+which.min(reg_f_summary$bic)
+# We can plot the minimum BIC index
+X11()
+plot(reg_f_summary$bic, xlab = "n_pred", ylab = " BIC", type = "l")
+plot(reg_f_summary$bic, xlim=c(10,30), ylim=c(-2100,-2000), xlab = "n_pred", ylab = " BIC", type = "l", col="red")
+```
+
+As we can see from the two command "which.min" and from the graph, the best model according to both the methods includes 22 variables.
+
+To help in the interpretation, it's mandatory to explain that the second plot shows better just an interval of the first. In fact, it shows the value of the BIC in the interval of X between 10 and 30 is important to have a better vision of the lambda which minimize the BIC.  
+
+
+QUESTION 4
+The Ridge and the Lasso regression are two different ways of shrinking method. The shrinking method is a method used in the model selection and it consists of using the least squares to fit a linear model containing subset of the predictors. 
+
+In both methods, we deal with a problem of constrained maximization. In the case of the ridge regression, the constraint is made up by the sum of the square of the coefficients, while in the lasso case, the constraint is the sum of the absolute value of the coefficients.
+
+N.B. The coefficients we're talking about are the maximum likelihood coefficients, which in the multiple linear regression are equal to the OLS ones.
+
+The difference of the two shrinking method is in the fact that the objective function of the ridge regression is still differentiable, while it's not the same in the case of the lasso.
+
+However, none of them dominate each other.
+
+In the Ridge regression, we can implement a hat matrix which is always invertible and there's always a unique solution.
+It's also important to underline that, in the shrinkage method, it's better to standardize both the covariates X and the responses Y, in order to have the same measurement scale for the coefficients.  
+As in the case of the best subset selection, the BIC index will be used to evaluate the best value of the lambda that should be include as Lagrange multiplier of the penalization function.
+
+```{r, fig.height = 4, fig.width = 6}
+
+# Use the standardized matrix of X and Y, 
+#since they can have different measurement scale
+# N.B: we don't consider the penalization on the intercept)
+Xscaled<-as.matrix(scale(X))
+l_yscaled<- as.matrix(scale(l_y))
+Xscaled1=model.matrix(l_yscaled~Xscaled)
+
+#Compute a for loop, in order to understand to obtain the index
+# BIC to obtain the best lamda that minimize it 
+lamda=seq(30, 90, by=0.2)
+I=diag(p)
+BIC= NULL
+for (i in 1:length(lamda)){
+  hatRidge=Xscaled%*%solve(t(Xscaled)%*%Xscaled+lamda[i]*I)%*%t(Xscaled)
+  est_yscaled=hatRidge%*%l_yscaled
+  df=sum(diag(hatRidge))
+  RSS_est_scaled=sum((l_yscaled-est_yscaled)^2)
+  BIC[i]=n*log(RSS)+log(n)*df
+}
+BIC
+which.min(BIC)
+plot(BIC,xlab="lambda", type = "l", col="blue")
+
+#Compute the Beta Ridge for different value of lambda
+betaRidge=matrix(nrow=122, ncol=301)
+for (i in 1:length(lamda)){
+  betaRidge[,i]=solve(t(Xscaled)%*%Xscaled+lamda[i]*I)%*%t(Xscaled)%*%l_yscaled
+}
+
+#Compute Beta Ridge with the best lambda (we round the coefficients, at second decimal place, in order to choose the one that are not shrunken toward 0)
+lambda=lamda[which.min(BIC)]
+lambda
+beta_Ridge=solve(t(Xscaled)%*%Xscaled+lambda*I)%*%t(Xscaled)%*%l_yscaled
+round(beta_Ridge, digits=2)
+X11()
+plot(beta_Ridge, xlab="X")
+
+
+
+# Plot the different possible value of the Beta ridge according to Lambda
+matplot(t(betaRidge), type = "l")
+
+#Compute Beta Lasso
+# Install the package "glmnet" to compute the Beta Lasso
+library(glmnet)
+# Compute the Beta lasso
+fit=glmnet(Xscaled,l_yscaled, nfolds=10)
+summary(fit)
+cvfit=cv.glmnet(Xscaled,l_yscaled, nfolds=10)
+summary(cvfit)
+
+# Plot the best lambda 
+plot(cvfit)
+plot(cvfit, xlim=c(-4,-2))
+```
+As we can see from the first part of the command, and the graph of the BIC of the different Ridge model, the minimum value of the BIC is the 301st   element of the interval we analysed. In this interval 301 different possible value for lambda have been analysed . These values belong to an interval of 30 and 90, with a difference of 0.2 between an element and the following one. 
+So, in this case, the best lambda is equal to 90. From the plot, we can see that most of the coefficients are shrunken to 0. For this reason, it needs to round them at the second decimal place and to consider those one, whose absolute value is major or equal to 0.05, as coefficients to include in the regression.  We can identify 26 coefficients that respect this assumption. Therefore, it’s possible to say that, according to the ridge regression and the assumed threshold value to not be shrunken, the number of regressors to include is greater than those one of the two best stepwise selection methods (even not so far).
+In the matplot graph, we can observe the value of the beta ridges coefficients according to the lambda. Each line refers to a specific coefficient. It’s evident that most of them are around 0.
+
+In the Lasso (Least Absolute Shrinkage Selection operator) regression, it's clear that's not so easy to compute the coefficients by hand, since it's not differentiable. For this reason, the glmnet command has been used. 
+
+Later on, it has been computed the Cross validation technique for the Lasso. This technique need to evaluate the best lambda in the model.
+
+The GCV should be minimized, and we can see a representation of that in the last 2 plots, with the log of lambda on the x axe and the mean square error on the y axe (N.B:the second plot is just a zoom of the first plot).
+The Mean square Error is a the mean of the residual and it measure of how well the predictions match the observations by the closeness of the predicted response to the real value for the same observation. When it's close, it means that the estimate is precise and that the y estimated are closed to the true value. For this reason, for a good estimation, we should minimise it.  
+
+Thanks to the command summary, it's possible to observe that the best lambda which minimize the mean square is equal to one and thanks to the last plot it's observed the model between 22 and 14 regressors. Therefore, it can be very similar to the best subset selection, where the lower points were between 10 and 25.  

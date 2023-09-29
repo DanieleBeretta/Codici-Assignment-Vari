@@ -1,0 +1,892 @@
+---
+title: "Daniele_Beretta_Bayesian_applied"
+author: "Beretta Daniele"
+date: "`r Sys.Date()"
+output: word_document
+---
+This document will show a statistical analysis about the students' hours of sleeping in the week days. 
+Theta is the proportion of the sample population who sleep at least 8 hours per day. The value of theta is unknown, so the uncertainty is based on a distribution of the prior which will be different according to the case in the three different models.
+
+The first and the second model deal with conjugate distribution(prior and posterior have the same marginal distribution).
+
+
+### MODEL 1
+
+In the first model data are distributed as a Bernoulli (sampling model) in function of theta  and theta's distributed as a Beta function with shape parameter alpha and rate parameter beta. Therefore theta can be assume value only between 0 and 1. To fit the parameters, Excel has been used, thanks to the possibility of using firstly the function INV.BETA and then the solver which provide an optimal soluction which respect the assumptions of the first and the third case.
+
+It's important to choose well the two priori parameters, because their sum refers to how much I'm sure about the theta's prior distribution(the lower is the sum, the minor is the certitude).
+
+The first case assume that the expected value of theta is 0,3 and we want to measure also the Bayes factor for the probability that theta is minor than 0.5.
+
+The Bayes factor is computed as posterior odds/prior odds, where the odds is the ratio of the probability of the null hypothesis and 1-probability of the null hypothesis.
+
+In the posterior the probability of the null hypothesis is conditioned to the data. 
+
+The posterior's parameters will be computed as the product of the likelihood of the sampling model and the priori distribution. In this first case, alpha posterior is equal to the sum of priori alpha and the sum of yi(observation in the data), while beta posterior is the sum of priori beta and the number of observation minus the sum of yi.
+
+The Bayes factor needs to perform the test of hypothesis when we make the inference using Bayesian statistics.
+
+In this case the prior probability that theta is minor than 0.5 is equal to 0.85.
+
+N.B.0.85 can be seen also as the integral of the prior density function from 0 to 0.5.
+
+The Bayes factor needs to perform the test of hypothesis when we make the inference using Bayesian statistics.
+
+Both the posterior and the prior will be plotted, in order to analyse how the distribution of theta changes according the new data.
+
+```{r}
+### CASE 1
+
+# The Prior to consider is distributed as Beta(alpha,beta)
+alpha_pr1=1.66
+beta_pr1=3.88
+
+# Compute the prior probability of theta to be minor than 0.5
+pie_pr1=pbeta(0.5,alpha_pr1,beta_pr1 )
+pie_pr1
+
+# Compute the posterior odds
+odds_pr1=pie_pr1/(1-pie_pr1)
+odds_pr1
+
+#Compute the Prior mean
+pr_mean1=alpha_pr1/(alpha_pr1+beta_pr1)
+pr_mean1
+
+#Vector of people analysed
+Dati= c(1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+
+# Observe the given data
+n=length(Dati) #number of students analysed
+n
+
+M=sum(Dati[]) #number of students that sleep at least 8 hours 
+M
+
+# Compute the mean of the data
+mean1.1= M/n
+mean1.1
+
+# Compute the posterior alpha & beta, according the theory 
+alpha_pst1= M+alpha_pr1
+alpha_pst1
+beta_pst1=beta_pr1+n-M
+beta_pst1
+
+# Compute the posterior mean and observe the probability of the posterior mean 
+mean_post1.1=alpha_pst1/(alpha_pst1+beta_pst1)
+mean_post1.1
+
+# Compute according the posterior, the probability that theta is <= 0.5
+prob_post1=pbeta(0.5, alpha_pst1, beta_pst1)
+prob_post1
+
+# Compute the posterior odds
+odds_post1=prob_post1/(1-prob_post1)
+odds_post1
+
+# Compute the Bayes Factor
+BF1=odds_post1/odds_pr1
+BF1
+
+# Plot to compare beta prior and beta posterior
+curve(dbeta(x,alpha_pr1,beta_pr1),from=0,to=1,col="red",
+      lwd=5,ylab="density",xlab="theta",ylim=c(0,5))
+curve(dbeta(x,alpha_pst1,beta_pst1),add=T,col="blue",
+      lwd=5,ylab="density",xlab="theta", ylim=c(0,5))
+legend(x="topright",legend=c("Prior 2.1.1", "Posterior 2.1.1"), 
+       col=c("red","blue"), lwd=5, lty=c(1,1))
+
+```
+
+As we can see, the Bayes factor is too low to affirm that data confirm the null hypothesis. In fact, it's just a "bare mention", but we cannot completely reject H0. 
+N.B. The posterior looks more distributed as a normal, compared to the Prior. This is due because the posterior parameteters are quite higher and the distribution tend to a Normal.
+
+In the second case of the first model,the expected value of theta and the probability of being minor than 0.5 are not known. 
+Since it ignores any sort of hypothesis, differently from the first and the third case, the sum of alpha and beta will be lower.   
+
+```{r}
+###CASE 2
+
+# The Prior to consider is distributed as Beta(alpha,beta)
+alpha_pr2=1.1
+beta_pr2=0.6
+
+# Compute the Prior mean
+pr_mean2=alpha_pr2/(alpha_pr2+beta_pr2)
+pr_mean2
+
+# Compute the Prior probability of a theta<= 0.5 
+pie_pr2=pbeta(0.5, alpha_pr2, beta_pr2)
+pie_pr2
+
+# Compute the Prior odds
+odds_pr2=pie_pr2/(1-pie_pr2)
+odds_pr2
+
+# Compute the posterior alpha & beta, according the theory 
+alpha_pst2= M+alpha_pr2
+alpha_pst2
+beta_pst2=beta_pr2+n-M
+beta_pst2
+
+# Compute the posterior mean and observe the probability of the posterior mean 
+mean_post1.2=alpha_pst2/(alpha_pst2+beta_pst2)
+mean_post1.2
+
+# According the posterior, compute the probability that theta is <= 0.5
+prob_post2=pbeta(0.5, alpha_pst2, beta_pst2)
+prob_post2
+
+# Compute the posterior odds
+odds_post2=prob_post2/(1-prob_post2)
+odds_post2
+
+# Compute the Bayes Factor
+BF2=odds_post2/odds_pr2
+BF2
+
+#Plot to compare beta prior and beta posterior
+curve(dbeta(x,alpha_pr2,beta_pr2),col="red",
+      lwd=5,ylab="density",xlab="theta", ylim=c(0,5))
+curve(dbeta(x,alpha_pst2,beta_pst2),add=T,n=27,col="blue",
+      lwd=5,ylab="density",xlab="theta", ylim=c(0,5))
+legend(x="topleft",legend=c("Prior 2.1.2.", "Posterior 2.1.2"), 
+       col=c("red","blue"), lwd=5, lty=c(1,1))
+
+```
+
+As it is evident, from the result of the Bayes Factor, the new data give a substantial evidence in favor of the null hypothesis. It's particular the distribution of the prior, while, as in the first case, the posterior tend to be distributed as a Normal.
+
+In the third case, the prior distribution is still a Beta, but the parameters change according to the hypothesis. In fact in this third case of the first model, the expected value of theta is equal to 0.7 and 0.85 is the probability of theta to be greater than 0.5.
+
+```{r}
+### CASE 3
+
+# The Prior to consider is distributed as Beta(alpha,beta)
+alpha_pr3=3.18
+beta_pr3=1.24
+
+#Compute the probability of the prior to be <=0.5
+pie_pr3=pbeta(0.5, alpha_pr3, beta_pr3)
+pie_pr3
+
+# Compute the prior odds
+odds_pr3=pie_pr3/(1-pie_pr3)
+odds_pr3
+
+#Compute the Prior mean
+pr_mean3=alpha_pr3/(alpha_pr3+beta_pr3)
+pr_mean3
+
+#Compute the posterior alpha & beta, according the theory 
+alpha_pst3= M+alpha_pr3
+alpha_pst3
+beta_pst3=beta_pr3+n-M
+beta_pst3
+
+# Compute the posterior mean and observe the probability of the posterior mean 
+mean_post1.3=alpha_pst3/(alpha_pst3+beta_pst3)
+mean_post1.3
+
+# Compute according the posterior, the probability that theta is <= 0.5
+prob_post3=pbeta(0.5, alpha_pst3, beta_pst3)
+prob_post3
+
+# Compute the posterior odds
+odds_post3=prob_post3/(1-prob_post3)
+odds_post3
+
+# Compute the Bayes Factor
+BF3=odds_post3/odds_pr3
+BF3
+
+#Plot to compare beta prior and beta posterior
+curve(dbeta(x,alpha_pr3,beta_pr3),col="red",
+      lwd=5,ylab="density",xlab="theta", ylim=c(0, 5))
+curve(dbeta(x,alpha_pst3,beta_pst3),add=T,n=27,col="blue",
+      lwd=5,ylab="density",xlab="theta", ylim=c(0,5))
+legend(x="topright",legend=c("Prior2.1.3", "Posterior2.1.3"), 
+       col=c("red","blue"), lwd=5, lty=c(1,1))
+
+```
+
+In the third case, since the Bayes Factor is equal to 13.9944, there's a strong evidence of the data in favor of the null hypothesis. It's possible to notice it, both from the plot and from the expected value, which greatly decreases to 0.45. In fact, in the posterior distribution, it's quite possible the real theta is lower than 0.5.
+
+
+### MODEL 2:
+AS it is said at the beginning, the second model is still conjugate. However, the sampling model now, it's no more continous.
+
+In fact, in this model theta can assume only 9 value in the interval from 0 to 1.
+
+The possible values for theta are {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9}.
+
+To deal with this model,a data frame, with the possible values of theta (priori_f2.1$P) and the respective probability, has been built.
+
+The request in the cases and the assumptions are the same of the first model.
+
+```{r}
+### CASE 1
+
+# Set the Priori function distribution
+priori_f2.1<-data.frame(P=seq(0.1,0.9, by=0.1),
+                     Prob=c(3/27, 4/27, 11/27, 3/27, 2/27,                             1/27, 1/27, 1/27,1/27 ))
+priori_f2.1
+sum(priori_f2.1$Prob)
+
+# Compute the expected value of theta 
+sum(priori_f2.1$Prob*priori_f2.1$P)
+
+# Compute the probability of being lower than  0.5
+pie_pr2.1=round(sum(priori_f2.1[1:5,2]), 2)
+pie_pr2.1
+
+# Compute the prior odds
+odds_pr2.1=pie_pr2.1/(1-pie_pr2.1)
+odds_pr2.1
+
+# Compute the Likelihood function of a binomial(sampling model)
+priori_f2.1$Likelihood_pr<-dbinom(11, size=27, prob=priori_f2.1$P)
+
+priori_f2.1
+
+# Compute the posterior:
+
+#1) Compute the product of Prior and the likelihood of the sampling model
+priori_f2.1$product_pr<-priori_f2.1$Likelihood_pr*priori_f2.1$Prob
+priori_f2.1$product_pr
+
+#2) Compute the posterior 
+post_f2.1=NULL
+for (i in 1:length(priori_f2.1$P)){
+ post_f2.1[i]=(priori_f2.1$product_pr[i])/sum(priori_f2.1$product_pr)
+}
+post_f2.1
+sum(post_f2.1)
+
+# Compute the probability of the posterior of being <=0.5
+pie_post2.1=sum(post_f2.1[1:5])
+pie_post2.1
+
+# Compute The posterior odds
+odds_post2.1=pie_post2.1/(1-pie_post2.1)
+
+#Compute the Bayes Factor
+BF2.1=odds_post2.1/odds_pr2.1
+BF2.1
+
+# Plot the prior distribution 
+plot(priori_f2.1$P,priori_f2.1$Prob, col="black", )
+
+#Plot the posterior distribution
+plot(priori_f2.1$P, post_f2.1, col="purple")
+
+```
+
+As in the third case of the first model, the Bayes Factor is higher than 10. It means there's a strong evidence of the new data in favor of the null hypothesis (theta<=0.5) and that we cannot reject it.
+
+In the second case, the distribution is not known. Here'it's assumed that theta assume the possible values with equal probability.  
+
+```{r}
+### CASE 2
+
+# Set the Priori function distribution
+priori_f2.2<-data.frame(P=seq(0.1,0.9, by=0.1),
+                        Prob=c(3/27, 3/27, 3/27, 3/27,                             3/27, 3/27, 3/27, 3/27,3/27 ))
+priori_f2.2
+sum(priori_f2.2$Prob)
+
+# Compute the expected value of theta 
+sum(priori_f2.2$Prob*priori_f2.2$P)
+
+# Compute the probabilty of being minor or equal than 0.5
+pie_pr2.2=round(sum(priori_f2.2[1:5,2]), 2)
+pie_pr2.2
+
+odds_pr2.2=pie_pr2.2/(1-pie_pr2.2)
+odds_pr2.2
+
+# Compute the Likelihood function of a binomial(sampling model)
+priori_f2.2$Likelihood_pr<-dbinom(11, size=27, prob=priori_f2.2$P)
+
+priori_f2.2
+
+# Compute the posterior:
+
+#1) Compute the product of prior and the likelihood of the sampling model
+priori_f2.2$product_pr<-priori_f2.2$Likelihood_pr*priori_f2.2$Prob
+priori_f2.2$product_pr
+
+#2) Compute the posterior 
+post_f2.2=NULL
+for (i in 1:length(priori_f2.2$P)){
+  post_f2.2[i]=(priori_f2.2$product_pr[i])/sum(priori_f2.2$product_pr)
+}
+post_f2.2
+sum(post_f2.2)
+
+# Compute the probability of the posterior of being <=0.5
+pie_post2.2=sum(post_f2.2[1:5])
+pie_post2.2
+
+# Compute The posterior odds
+odds_post2.2=pie_post2.2/(1-pie_post2.2)
+
+#Compute the Bayes Factor
+BF2.2=odds_post2.2/odds_pr2.2
+BF2.2
+
+# Plot the distribution of the prior 
+plot(priori_f2.2$P,priori_f2.2$Prob)
+# Plot the distribution of the posterior
+plot(priori_f2.2$P, post_f2.2)
+
+```
+
+The Bayes Factor is still higher than 10. Once again, the data seem to confirm the null hypothesis, which cannot be rejected.
+
+At the end, we can see the third case, where the expected value is appriximately equal to 0,7 and the probability of being lower than 0.5 is equal to 0.15. 
+```{r}
+### CASE 3
+# Set the Priori function distribution
+priori_f2.3<-data.frame(P=seq(0.1,0.9, by=0.1),
+                        Prob=c(0.3/27, 0.7/27, 1/27, 1/27,                                1/27, 5/27, 11/27,                                         4/27,3/27))
+priori_f2.3
+sum(priori_f2.3$Prob)
+
+# Compute the expected value of theta 
+sum(priori_f2.3$Prob*priori_f2.3$P)
+pie_pr2.3=round(sum(priori_f2.3[1:5,2]), 2)
+pie_pr2.3
+
+# Compute the Prior odds
+odds_pr2.3=pie_pr2.3/(1-pie_pr2.3)
+odds_pr2.3
+
+# Compute the Likelihood function of a binomial(sampling model)
+priori_f2.3$Likelihood_pr<-dbinom(11, size=27, prob=priori_f2.3$P)
+
+priori_f2.3
+
+#We can start to compute the posterior:
+
+#1) Compute the product of the prior and the likelihood of the sampling model
+priori_f2.3$product_pr<-priori_f2.3$Likelihood_pr*priori_f2.3$Prob
+priori_f2.3$product_pr
+
+#2) Compute the posterior 
+post_f2.3=NULL
+for (i in 1:length(priori_f2.3$P)){
+  post_f2.3[i]=(priori_f2.3$product_pr[i])/sum(priori_f2.3$product_pr)
+}
+post_f2.3
+sum(post_f2.3)
+
+# Compute the probability of the posterior of being <=0.5
+pie_post2.3=sum(post_f2.3[1:5])
+pie_post2.3
+
+# Compute The posterior odds
+odds_post2.3=pie_post2.3/(1-pie_post2.3)
+
+#Compute the Bayes Factor
+BF2.3=odds_post2.3/odds_pr2.3
+BF2.3
+
+# Plot the prior distribution
+plot(priori_f2.3$P,priori_f2.3$Prob)
+
+#Plot the posterior distribution
+plot(priori_f2.3$P, post_f2.3)
+```
+
+As in the other discrete cases, there's a strong evidence of the data in favor of the null hypothesis (theta <=0.5)
+
+According to the six Bayes factors computed so far, there's a clear evidence that, according to the possible prior data in the different cases, the new data in the discrete model tend to have a stronger evidence in favor of the data.
+To affirm that, it's recommended to look at the comparison between the Bayes factor of the first two cases of the first and the second model.
+
+Even in both models, the prior parameters are not so sure, in the first model, the two Bayes factor are not so strong to have a good acceptance of the null hypothesis. In the first case is minor than 3.2 (just a bare mention of the data in favor of the null hypothesis), while in the second the data's evidence is substantious but less strong than in the same cases of the second model.
+
+
+### MODEL 3
+The third model is quite different from the two we've analysed so far. In fact, this model observe a determined prior density function, which is different from the beta in the first model and the discrete one in the second. 
+
+In addition this new prior density distribution is a three parameters function (theta, which must be >0 and <1, c and s, which must be >0). 
+
+As the exercise require we should use a Metropolis Hasting algorithm. This algorithm works on the prediction of a determined parameter, holding all the other fixed.
+
+For this reason we require to analyse the prior, to compute the prior expected value of theta, and the probability of theta to be lower than 0.5, given the others two parameters,which can assume both 3 possible values:
+c=-1, 0, 1
+s= 4, 1, 0.1 
+
+To do the prior analysis, a Monte Carlo integration procedure should be implemented.  Theta is assumed to distributed as (1/1+e^-x) and x is a random variable distributed as normal with mean "c" and variance "s^2". In addition, we assume that the number of repetition in the Montecarlo is equal to 100 (the variance will be quite high, but it's a choose in order to compare this model with the other two where the uncertainty was important).
+
+N.B: In this case the G theta used to compute the Monte Carlo are i.i.d. (indipendent identically distributed)
+
+The Montecarlo error is a measure of the accuracy of the estimation. It decreases when the number of repetition increases.
+
+Together with the Montecarlo procedure, the empirical cumulative distribution function (ecdf) has been implemented. This function is an approximation of the density function and it's important in order to compute the probability for the prior odds.
+
+
+```{r}
+
+G=10000
+#We can consider the Prior Density Analisys
+#C=-1, s=4
+
+set.seed(1102)
+thetag1<-(1/(1+exp(-(rnorm(G,mean=-1,sd=4)))))
+
+#We can estimate the expected value of theta given the data
+Eth1=1/G*sum(thetag1)
+Eth1
+
+# Running the mean
+run_mean1 <- cumsum(thetag1)/(1:G)
+
+# Plot the first case
+plot(1:G,run_mean1,main="running mean first case",
+     xlab="g",ylab="hat eta_g",col="red",type="l",ylim=c(0,1))
+
+### Compute the Monte Carlo error
+MCerror1 <- 1/sqrt(G)*sd(thetag1)*qnorm(1-0.01)
+MCerror1
+
+# Observe the empirical cumulative distribution function 
+estF1 <- ecdf(thetag1)
+plot(estF1)
+estF1(.5)
+
+#C=0, S=4
+#We can consider the Prior Density Analisys
+
+set.seed(1102)
+thetag2<-(1/(1+exp(-(rnorm(G,mean=0,sd=4)))))
+
+#We can estimate the expected value of theta given the data
+Eth2=1/G*sum(thetag2)
+Eth2
+
+# Running the mean
+run_mean2 <- cumsum(thetag2)/(1:G)
+
+# Plot the 2nd case
+plot(1:G,run_mean2,main="running mean 2nd case",
+     xlab="g",ylab="hat eta_g",col="red",type="l",ylim=c(0,1))
+
+### Compute the Monte Carlo error
+MCerror2 <- 1/sqrt(G)*sd(thetag2)*qnorm(1-0.01)
+MCerror2
+
+# Observe the empirical cumulative distribution function
+estF2 <- ecdf(thetag2)
+plot(estF2)
+estF2(.5)
+
+#C=1, S=4
+# Consider the Prior Density Analisys
+set.seed(1102)
+thetag3<-(1/(1+exp(-rnorm(G,mean=1,sd=4))))
+
+# Estimate the expected value of theta given the data
+Eth3=1/G*sum(thetag3)
+Eth3
+
+# Running the mean
+run_mean3 <- cumsum(thetag3)/(1:G)
+
+# Plot the first case
+plot(1:G,run_mean3,main="running mean 3rd case",
+     xlab="g",ylab="hat eta_g",col="red",type="l",ylim=c(0,1))
+
+# Compute the Monte Carlo error
+MCerror3 <- 1/sqrt(G)*sd(thetag3)*qnorm(1-0.01)
+MCerror3
+
+#Observe the Emprical cumulative distribution function
+estF3 <- ecdf(thetag3)
+plot(estF3)
+estF3(.5)
+
+
+#C=-1, S=1
+# Consider the Prior Density Analisys
+set.seed(1102)
+thetag4<-(1/(1+exp(-rnorm(G,mean=-1,sd=1))))
+
+# Estimate expected value of theta given the data
+Eth4=1/G*sum(thetag4)
+Eth4
+
+# Running the mean
+run_mean4 <- cumsum(thetag4)/(1:G)
+
+# Plot the first case
+plot(1:G,run_mean4,main="running mean 4th case",
+     xlab="g",ylab="hat eta_g",col="red",type="l",ylim=c(0,1))
+
+# Compute the Monte Carlo error
+MCerror4 <- 1/sqrt(G)*sd(thetag4)*qnorm(1-0.01)
+MCerror4
+
+# Observe the Emprical cumulative distribution function
+estF4 <- ecdf(thetag4)
+plot(estF4)
+estF4(.5)
+
+#C=0, S=1
+# Consider the Prior Density Analisys
+set.seed(1102)
+thetag5<-(1/(1+exp(-rnorm(G,mean=0,sd=1))))
+
+# Estimate expected value of theta given the data
+Eth5=1/G*sum(thetag5)
+Eth5
+
+# Running the mean
+run_mean5 <- cumsum(thetag5)/(1:G)
+
+# Plot the first case
+plot(1:G,run_mean5,main="running mean 5th case",
+     xlab="g",ylab="hat eta_g",col="red",type="l",ylim=c(0,1))
+
+# Compute the Monte Carlo error
+MCerror5 <- 1/sqrt(G)*sd(thetag3)*qnorm(1-0.01)
+MCerror5
+
+# Observe the empircal cumulative distribution function
+estF5 <- ecdf(thetag5)
+plot(estF5)
+estF5(.5)
+
+#C=1, S=1
+
+#Consider the Prior Density Analisys
+set.seed(1102)
+thetag6<-(1/(1+exp(-rnorm(G,mean=1,sd=1))))
+
+# Estimate the expected value of theta given the data
+Eth6=1/G*sum(thetag6)
+Eth6
+
+# Running the mean
+run_mean6 <- cumsum(thetag6)/(1:G)
+
+# Plot the first case
+plot(1:G,run_mean6,main="running mean 6th case",
+     xlab="g",ylab="hat eta_g",col="red",type="l",ylim=c(0,1))
+
+# Compute the Monte Carlo error
+MCerror6 <- 1/sqrt(G)*sd(thetag6)*qnorm(1-0.01)
+MCerror6
+
+#Observe the Emprical cumulative distribution function
+estF6 <- ecdf(thetag6)
+plot(estF6)
+estF6(.5)
+
+#C=-1, S=0.1
+#Consider the Prior Density Analisys
+set.seed(1102)
+thetag7<-(1/(1+exp(-rnorm(G,mean=-1,sd=.1))))
+
+# Estimate the expected value of theta given the data
+Eth7=1/G*sum(thetag7)
+Eth7
+
+# Running the mean
+run_mean7<- cumsum(thetag7)/(1:G)
+
+# Plot the 7th case
+plot(1:G,run_mean7,main="running mean 7th case",
+     xlab="g",ylab="hat eta_g",col="red",type="l",ylim=c(0,1))
+
+# Compute the Monte Carlo error
+MCerror7 <- 1/sqrt(G)*sd(thetag7)*qnorm(1-0.01)
+MCerror7
+
+# Observe the Emprical cumulative distribution function
+estF7 <- ecdf(thetag7)
+plot(estF7)
+estF7(.5)
+
+#C=0, S=0.1
+#Consider the Prior Density Analisys
+set.seed(1102)
+thetag8<-(1/(1+exp(-rnorm(G,mean=0,sd=.1))))
+
+# Estimate the expected value of theta given the data
+Eth8=1/G*sum(thetag8)
+Eth8
+
+# Running the mean
+run_mean8 <- cumsum(thetag8)/(1:G)
+
+# Plot the 8th case
+plot(1:G,run_mean1,main="running mean 8th case",
+     xlab="g",ylab="hat eta_g",col="red",type="l",ylim=c(0,1))
+
+# Compute the Monte Carlo error
+MCerror8 <- 1/sqrt(G)*sd(thetag8)*qnorm(1-0.01)
+MCerror8
+
+# Observe the Emprical cumulative distribution function
+estF8 <- ecdf(thetag8)
+plot(estF8)
+estF8(.5)
+
+#C=1, S=0.1
+#Consider the Prior Density Analisys
+set.seed(1102)
+thetag9<-(1/(1+exp(-rnorm(G,mean=1,sd=.1))))
+
+#Estimate the expected value of theta given the data
+Eth9=1/G*sum(thetag9)
+Eth9
+
+#Running the mean
+run_mean9 <- cumsum(thetag9)/(1:G)
+
+#Plot the case
+plot(1:G,run_mean1,main="running mean 9th case",
+     xlab="g",ylab="hat eta_g",col="red",type="l",ylim=c(0,1))
+
+# Compute the Monte Carlo error
+MCerror9 <- 1/sqrt(G)*sd(thetag9)*qnorm(1-0.01)
+MCerror9
+
+# Observe the Emprical cumulative distribution function
+estF9 <- ecdf(thetag9)
+plot(estF9)
+estF9(.5)
+
+```
+
+The results of the prior analysis can be observed in the following two tables. The first refers to the possible expected value of theta, which will be used in the third model as the currents state, while the second refers to the probability of theta to be minor than 0.5
+
+
+After having analysed the Prior, it's possible to start to analyse different cases for the third model.
+
+The assumptions for each case are the same of the first case.
+
+Firstly, it needs to implement the Metropolis Hasting algorithm. 
+```{r}
+G=10000
+n=27
+M=11
+c=c(-1,0,1)
+s=c(4,1,0.1)
+#Posterior kernel
+target<-function(theta0, n, M, c, s){
+  if(theta0>0&theta0<1&s>0){return(
+    postK=(1/(s*sqrt(2*3.14)))*exp((-1/(2*s^2))*(log(theta0/(1-theta0))-c)^2)*(1/(theta0*(1-theta0)))*
+      ((theta0)^M*(1-theta0)^(n-M)))}
+  else{return(0)}}
+
+MH<-function (G,burnin,thin,c ,s, n, M,eta,th0=0.3)
+{
+  iterations <- burnin+thin*G
+  g <- 1
+  # Define the output vector
+  theta <- vector("numeric", G)
+  current_state<-th0
+  theta[1]<-current_state
+  current_state <- th0 # the current state of the chain is th_0
+  acc=0; # This variable is to count how many time I accept a transition
+  for (iter in 1:iterations) {
+    prop_state = (1/(1+exp(-rnorm(1,mean=c,sd=s))))
+    if(prop_state<0|prop_state>1){# If we propose a negative value, we cannot accept it
+      lo_alpha <- -Inf
+    }else{
+      acc_ratio= target(theta0 = prop_state, c, s, n, M)/target(th = current_state, c, s, n, M)
+      lo_alpha <- min(0, log(acc_ratio))
+    }
+    u <- runif(1)
+    if (u < exp(lo_alpha)){
+      #Accept the move
+      current_state <- prop_state
+      acc <- acc+1
+    }
+    else{
+      #reject the move 
+      current_state <- current_state
+    }
+    if( (iter>burnin) && (iter%%thin==0) ){
+      # If iter is larger than burn
+      # and iter is multiple of thin
+      # Save the current_state
+      theta[g] <- current_state
+      g <- g+1
+    }
+  }
+  cat("I accepted the ", acc/iterations*100,"% of the proposed transition\n")
+  return(theta)
+}
+
+```
+
+
+According to what is required in the first case, c=-1 and  s=1 are the best value for the two parameters.
+
+```{r}
+#Run the algorithm
+set.seed(1102)
+theta_sample1<-MH(10000, 5000, 120, -1, 1, 27, 11, 0.8, th0=0.3)
+mean(theta_sample1)
+
+# Plot chain of theta
+plot(theta_sample1, type = "l")
+
+# Plot the autocorrelation function
+acf(theta_sample1)
+
+# Observe if the chain is stationary
+plot(cumsum(theta_sample1)/1:G, xlab="G", ylab="E(theta)")
+
+#Create Markov Chain Monte Carlo object
+library(coda)
+th.post.mc1 = mcmc(theta_sample1)
+summary(th.post.mc1)
+
+# Compute the posterior probability of theta <=0.5 
+prob_post3.1 = ecdf(th.post.mc1)(0.5)
+prob_post3.1
+
+#Looking at the table and the ECDF after the Monte Carlo analysis of the prior
+prob_prior3.1 = 0.85 
+
+#Compute the prior odds
+prior_odds3.1 = prob_prior3.1/(1-prob_prior3.1)
+prior_odds3.1
+
+#Compute the posterior odds
+posterior_odds3.1 = prob_post3.1/(1-(prob_post3.1))
+posterior_odds3.1
+
+# Compute the Bayes Factor
+BF3.1 = (posterior_odds3.1/prior_odds3.1) 
+BF3.1
+
+```
+
+As it's possible to observe, despite the burnin and the thinnin reduce the autocorrelation, the theta in the chain result highly correlated and the percentage of transition's acception is quite low. From the graph, it's clear the chain is not stationary, since it looks that it continues decreasing also after 10000.
+
+The Bayes Factor shows that the new data imply evidence to the alternative hypothesis(theta>0.5). It's an opposite result from that one of the same case of the second model.  
+
+In the second case, the parameter c is equal to 0 while s is still equal to 1.
+
+```{r}
+### CASE 2
+#Run the algorithm
+set.seed(1102)
+theta_sample2<-MH(10000, 5000, 100, 0, 1, 27, 11, 0.8, th0=0.49)
+mean(theta_sample2)
+
+# Plot chain of theta 
+plot(theta_sample2, type = "l")
+
+# Plot the autocorrelation function
+acf(theta_sample2)
+
+#Observe if the chain is stationary
+plot(cumsum(theta_sample2)/1:G, xlab="G", ylab="E(theta)")
+
+#Create Markov Chain Monte Carlo object
+library(coda)
+th.post.mc2 = mcmc(theta_sample2)
+summary(th.post.mc2)
+
+# Compute the posterior probability of theta <=0.5 
+prob_post3.2 = ecdf(th.post.mc2)(0.5)
+prob_post3.2
+
+#Looking at the table and the ecdf after the Monte Carlo analyss of the prior
+prob_prior3.2 = 0.5 
+
+#Compute the prior odds
+prior_odds3.2 = prob_prior3.2/(1-prob_prior3.2)
+prior_odds3.2
+
+#Compute the posterior odds
+posterior_odds3.2 = prob_post3.2/(1-(prob_post3.2))
+posterior_odds3.2
+
+# Compute the Bayes Factor
+BF3.2 = (posterior_odds3.2/prior_odds3.2) 
+BF3.2
+
+```
+
+In this second case, the autocorrelation is lower than in the first one. As we cans see, it converges to the expected value of theta_sample2, which in this case is then expected value of our posterior and it's more or less equal to 0.85.
+
+As in the first case, the Bayes Factor is very low. Therefore, we can reject the null hypothesis(theta <=0.5), in favor of the alternative hypothesis (theta>0.5). 
+
+The third case, the prior is the opposite one of the first case. For this reason c and s are both set equal to 1.
+```{r}
+### CASE 3
+#Run the algorithm
+set.seed(1102)
+theta_sample3<-MH(10000, 5000, 120, 1, 1, 27, 11, 0.8, th0=0.69)
+mean(theta_sample3)
+
+# Plot chain of theta
+plot(theta_sample3, type = "l")
+
+# Plot the autocorrelation function
+acf(theta_sample3)
+
+#Observe if the chain is stationary
+plot(cumsum(theta_sample3)/1:G, xlab="G", ylab="E(theta)")
+
+#Create Markov Chain Monte Carlo object
+library(coda)
+th.post.mc3 = mcmc(theta_sample3)
+summary(th.post.mc3)
+
+# Compute the posterior probability of theta <=0.5 
+prob_post3.3 = ecdf(th.post.mc3)(0.5)
+prob_post3.3
+
+#Looking at the table and the ecdf after the Monte Carlo analisys of the prior
+prob_prior3.3 = 0.15 
+
+#Compute the prior odds
+prior_odds3.3 = prob_prior3.3/(1-prob_prior3.3)
+prior_odds3.3
+
+#Compute the posterior odds
+posterior_odds3.3 = prob_post3.3/(1-(prob_post3.3))
+posterior_odds3.3
+
+# Compute the Bayes Factor
+BF3.3 = (posterior_odds3.3/prior_odds3.3) 
+BF3.3
+
+
+```
+
+As in the second case, from the graph we can understand that the autocorrelation is low.
+
+The percentage of accepted transition is above 46% and the chain look stationary around 0.85. Since it's very similar to the second case, it looks as if it is the real value for theta. 
+
+The Bayes factor is higher than those one from the first two case of this model. However, it's still low to not reject the null hypothesis(theta<0.5).
+
+Looking at these last three cases, the hypothesis that the percentage of students, who sleep at least 8 hours per week-day, is lower or equal to 50% could be reject. This is due to the fact that the data suggest the evidence of the alternative hypothesis (theta>0.5).
+
+Consequently to this, looking at the results of the Bayes Factors in the three different models, it's important to underline that the choose of the prior distribution and its parameters has a huge influence on the results of the analysis. 
+
+So, Bayesian analysis does not require a simple data collection. There are previous step to do if we want to arrive to a right conclusion.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
