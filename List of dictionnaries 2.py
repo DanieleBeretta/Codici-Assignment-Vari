@@ -24,16 +24,7 @@ def Insert():
                      "altezza": h})
     print(cani)
 
-#Inserisci nuova chiave
-    
-def Ins():
-    chiave=input("Nuova chiave: ")
-    for pos in range(len(cani)):
-        value=input("Sesso: ")
-        x[pos][chiave]=value
-    print(cani)
-
-    
+#Inserisci nuova chiave    
 def Ins():
     chiave=input("Nuova chiave: ")
     for pos in range(len(cani)):
@@ -43,8 +34,7 @@ def Ins():
 
     
 #visualizza ed elimina cane con peso minore
-    
-def delete():
+def Del():
     minore=1000
     pos=0
     for p in range(len(cani)):
@@ -56,7 +46,7 @@ def delete():
     print(cani)
 
     
-#Dlete cane con peso maggiore
+#Delete cane con peso maggiore
     
 def delete():
     maggiore=0
@@ -75,42 +65,41 @@ def modi():
     cane=None
     pesomagg=0
     newname=input("Nuovo nome: ")
-...     for pos in range(len(cani)):
-...         if cani[pos]["peso"]>pesomagg:
-...             pesomagg=cani[pos]["peso"]
-...             cane=cani[pos]["razza"]
-...             print(cane,pesomagg)
-...             cani[pos]["razza"]=newname
-...     print(cani)
-... 
-...     
->>> #Calcola totale peso
-...     
->>> def Tot():
-...     s=0
-...     avg=0
-...     for pos in range(len(cani)):
-...         s=s+cani[pos]["peso"]
-...         avg=s/len(cani)
-...     print(f"The sum is {s} and the average is {avg}")
-... 
-...     
+    for pos in range(len(cani)):
+         if cani[pos]["peso"]>pesomagg:
+             pesomagg=cani[pos]["peso"]
+             cane=cani[pos]["razza"]
+             print(cane,pesomagg)
+             cani[pos]["razza"]=newname
+     print(cani)
+ 
+ 
+#Calcola totale peso
+     
+def Tot():
+     s=0
+     avg=0
+     for pos in range(len(cani)):
+         s=s+cani[pos]["peso"]
+         avg=s/len(cani)
+     print(f"The sum is {s} and the average is {avg}")
+ 
+     
 >>> #Modifica peso di ogni cane
-...     
->>> def ed():
-...     for pos in range(len(cani)):
-...         newpeso=int(input("Nuovo peso: "))
-...         cani[pos]["peso"]=newpeso
-...     print(cani)
-... 
-...     
->>> #Salva dati
-...     
->>> def salva():
-...     myfile=open("Cani.txt","w")
-...     for d in cani:
-...         for m in d:
-...             print(m, d[m], file=myfile)
-...     myfile.close()
-...     print("dati salvati")
-... 
+     
+def ed():
+     for pos in range(len(cani)):
+         newpeso=int(input("Nuovo peso: "))
+         cani[pos]["peso"]=newpeso
+     print(cani)
+ 
+     
+#Salva dati
+     
+def salva():
+     myfile=open("Cani.txt","w")
+     for d in cani:
+         for m in d:
+             print(m, d[m], file=myfile)
+     myfile.close()
+     print("dati salvati") 
