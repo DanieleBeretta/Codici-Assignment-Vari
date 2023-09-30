@@ -81,6 +81,3 @@ def Save():
      myfile.close()
      print("Dati salvati")
  
-     
->>> Save()
-Dati salvati
