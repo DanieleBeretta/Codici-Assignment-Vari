@@ -1,5 +1,4 @@
-Python 3.10.7 (tags/v3.10.7:6cc6b13, Sep  5 2022, 14:08:36) [MSC v.1933 64 bit (AMD64)] on win32
-Type "help", "copyright", "credits" or "license()" for more information.
+
 DD={"Date"   : {0 : "27-Jan-2023",
                 1 : "30-Jan-2023"},
     "Low"    : {0 : 987.20,
@@ -106,34 +105,34 @@ def hp():
                 maxy=DD["High"][k]
                 chiave=k
     print(DD["Date"][chiave], DD["Volume"][chiave])
-... 
-...         
->>> #Calcola media of AdjP for a month
-...         
->>> def AvgAdjP():
-...     mese=input("Quale mese (Mon-yyyy): ")
-...     avg=0
-...     s=0
-...     count=0
-...     for key in DD:
-...         for k in DD[key]:
-...             if DD["Date"][k][3:]==mese:
-...                 count=count+1
-...                 s=s+DD["AdjP"][k]
-...                 avg=s/count
-...     print(f" the average for {mese} is {avg}")
-... 
+ 
+         
+#Calcola media of AdjP for a month
+        
+def AvgAdjP():
+     mese=input("Quale mese (Mon-yyyy): ")
+     avg=0
+     s=0
+     count=0
+     for key in DD:
+         for k in DD[key]:
+             if DD["Date"][k][3:]==mese:
+                 count=count+1
+                 s=s+DD["AdjP"][k]
+                 avg=s/count
+     print(f" the average for {mese} is {avg}")
+ 
+     
+#Show AdjP for a typed date
 ...     
->>> #Show AdjP for a typed date
-...     
->>> def show():
-...     date=input("Data: ")
-...     for key in DD:
-...         for k in DD[key]:
-...             if DD["Date"][k]==date:
-...                 print(DD["AdjP"][k])
-... 
-...                 
+def show():
+   date=input("Data: ")
+   for key in DD:
+      for k in DD[key]:
+          if DD["Date"][k]==date:
+              print(DD["AdjP"][k])
+ 
+               
 
 while True:
     print("""
@@ -161,113 +160,3 @@ while True:
 
         
 
-1) Add new day
-2) Change value
-3) Highest price and its date
-4) Average adjusted price for a month
-5) Adjusted price for a date
-
-==> 1
-Inserisci nuova data (dd-Mon-yyyy): 27-Jan-2023
-Gia presente
-{'Date': {0: '27-Jan-2023', 1: '30-Jan-2023'}, 'Low': {0: 987.2, 1: 800.25}, 'High': {0: 1040.35, 1: 940.25}, 'Close': {0: 1025.46, 1: 920.3}, 'AdjP': {0: 1010.35, 1: 935.45}, 'Volume': {0: 10000, 1: 25000}}
-
-1) Add new day
-2) Change value
-3) Highest price and its date
-4) Average adjusted price for a month
-5) Adjusted price for a date
-
-==> 1
-Inserisci nuova data (dd-Mon-yyyy): 28-Jan-2023
-New low price: 850.45
-New high price: 1050.65
-New close price: 975.43
-New adjusted price: 1030.4
-New Volume: 17000
-{'Date': {0: '27-Jan-2023', 1: '30-Jan-2023', 2: '28-Jan-2023'}, 'Low': {0: 987.2, 1: 800.25, 2: 850.45}, 'High': {0: 1040.35, 1: 940.25, 2: 1050.65}, 'Close': {0: 1025.46, 1: 920.3, 2: 975.43}, 'AdjP': {0: 1010.35, 1: 935.45, 2: 1030.4}, 'Volume': {0: 10000, 1: 25000, 2: 17000}}
-
-1) Add new day
-2) Change value
-3) Highest price and its date
-4) Average adjusted price for a month
-5) Adjusted price for a date
-
-==> 2
-Cosa modificare: 1
-Quale giorno: 2
-Nuova data: 29-Jan-2023
-{'Date': {0: '27-Jan-2023', 1: '30-Jan-2023', 2: '29-Jan-2023'}, 'Low': {0: 987.2, 1: 800.25, 2: 850.45}, 'High': {0: 1040.35, 1: 940.25, 2: 1050.65}, 'Close': {0: 1025.46, 1: 920.3, 2: 975.43}, 'AdjP': {0: 1010.35, 1: 935.45, 2: 1030.4}, 'Volume': {0: 10000, 1: 25000, 2: 17000}}
-
-1) Add new day
-2) Change value
-3) Highest price and its date
-4) Average adjusted price for a month
-5) Adjusted price for a date
-
-==> 2
-Cosa modificare: 6
-Quale giorno: 1
-Nuovo volume: 21000
-{'Date': {0: '27-Jan-2023', 1: '30-Jan-2023', 2: '29-Jan-2023'}, 'Low': {0: 987.2, 1: 800.25, 2: 850.45}, 'High': {0: 1040.35, 1: 940.25, 2: 1050.65}, 'Close': {0: 1025.46, 1: 920.3, 2: 975.43}, 'AdjP': {0: 1010.35, 1: 935.45, 2: 1030.4}, 'Volume': {0: 10000, 1: 21000, 2: 17000}}
-
-1) Add new day
-2) Change value
-3) Highest price and its date
-4) Average adjusted price for a month
-5) Adjusted price for a date
-
-==> 2
-Cosa modificare: 7
-Wrong choice
-
-1) Add new day
-2) Change value
-3) Highest price and its date
-4) Average adjusted price for a month
-5) Adjusted price for a date
-
-==> 3
-29-Jan-2023 17000
-
-1) Add new day
-2) Change value
-3) Highest price and its date
-4) Average adjusted price for a month
-5) Adjusted price for a date
-
-==> 4
-Quale mese (Mon-yyyy): Jan-2023
- the average for Jan-2023 is 992.066666666667
-
-1) Add new day
-2) Change value
-3) Highest price and its date
-4) Average adjusted price for a month
-5) Adjusted price for a date
-
-==> 5
-Data: 28-Jan-2023
-
-1) Add new day
-2) Change value
-3) Highest price and its date
-4) Average adjusted price for a month
-5) Adjusted price for a date
-
-==> 5
-Data: 29-Jan-2023
-1030.4
-1030.4
-1030.4
-1030.4
-1030.4
-1030.4
-
-1) Add new day
-2) Change value
-3) Highest price and its date
-4) Average adjusted price for a month
-5) Adjusted price for a date
-
-==> -1
